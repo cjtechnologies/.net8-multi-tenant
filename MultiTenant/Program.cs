@@ -4,6 +4,7 @@ using MultiTenant.Filters;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton(new TenantSettings());
 builder.Services.AddScoped<ITenantProvider, TenantProvider>();
 builder.Services.AddScoped<IConnectionStringResolver, ConnectionStringResolver>();
 builder.Services.AddScoped<TenantDbContextFactory>();

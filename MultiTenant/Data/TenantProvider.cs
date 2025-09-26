@@ -17,7 +17,7 @@
         public string GetTenant()
         {
             var tenant = _httpContextAccessor.HttpContext?.Request.Headers["X-Tenant"].FirstOrDefault();
-            return tenant ?? "DefaultTenant";
+            return tenant ?? "Tenant";
         }
     }
 }

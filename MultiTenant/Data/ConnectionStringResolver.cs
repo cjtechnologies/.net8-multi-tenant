@@ -7,17 +7,21 @@
 
     public class ConnectionStringResolver : IConnectionStringResolver
     {
-        private readonly IConfiguration _configuration;
+        private readonly TenantSettings _settings;
 
-        public ConnectionStringResolver(IConfiguration configuration)
+        public ConnectionStringResolver(TenantSettings settings)
         {
-            _configuration = configuration;
+            _settings = settings;
         }
 
         public string Resolve(string tenant)
         {
-            // Example: stored in appsettings.json
-            return _configuration.GetConnectionString(tenant);
+            var tenantConfig = _settings.Tenants.FirstOrDefault(t => t.Name.Equals(tenant, StringComparison.OrdinalIgnoreCase));
+            if (tenantConfig == null)
+            {
+                throw new Exception($"No connection string found for tenant '{tenant}'");
+            }
+            return tenantConfig.ConnectionString;
         }
     }
 }
