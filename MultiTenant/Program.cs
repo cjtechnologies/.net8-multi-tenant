@@ -1,3 +1,4 @@
+using Microsoft.OpenApi.Models;
 using MultiTenant.Data;
 using MultiTenant.Filters;
 
@@ -16,7 +17,52 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.OperationFilter<TenantHeaderOperationFilter>();
+    // JWT auth (if you already have it)
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        Description = "Enter JWT Bearer token"
+    });
+
+    // Tenant header auth
+    options.AddSecurityDefinition("Tenant", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "X-Tenant",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Tenant",
+        Description = "Tenant name (e.g. Org1, Org2)"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new List<string>()
+        },
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Tenant"
+                }
+            },
+            new List<string>()
+        }
+    });
+    //options.OperationFilter<TenantHeaderOperationFilter>();
 });
 
 var app = builder.Build();
